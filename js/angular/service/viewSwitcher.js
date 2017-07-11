@@ -25,6 +25,7 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
   var VIEW_STATUS_STAGED = 'stage';
 
   var transitionCounter = 0;
+  var transitionResolved = 0;
   var nextTransition, nextDirection;
   ionic.transition = ionic.transition || {};
   ionic.transition.isActive = false;
@@ -253,6 +254,7 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
           function transitionComplete() {
             if (transitionComplete.x) return;
             transitionComplete.x = true;
+            ++transitionResolved;
 
             enteringEle.off(TRANSITIONEND_EVENT, completeOnTransitionEnd);
             $timeout.cancel(enteringEle.data(DATA_FALLBACK_TIMER));
@@ -263,7 +265,7 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
 
             // the most recent transition added has completed and all the active
             // transition promises should be added to the services array of promises
-            if (transitionId === transitionCounter) {
+            if (transitionResolved === transitionCounter) {
               $q.all(transitionPromises).then(ionicViewSwitcher.transitionEnd);
 
               // emit that the views have finished transitioning
